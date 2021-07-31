@@ -11,7 +11,7 @@
  *
  */
 
-const DUR = 0.2     // duration in seconds
+const DUR = 0.05     // duration in seconds
 const NCH = 1     // number of channels
 const SPS = 44100 // samples per second
 const BPS = 1     // bytes per sample
@@ -66,7 +66,7 @@ function put(n, l)
 
 let b = document.getElementsByTagName('button')[0];
 
-function genTone(freaq){
+function genTone(freaq,vol){
 
 	b.innerHTML = "foo";
 
@@ -98,6 +98,8 @@ function genTone(freaq){
 			j/SPS * Math.PI * 2 * 30
 			) + 1
 			) / 2 
+			*
+			vol
 			*
 			//((SPS*DUR-j)/(SPS*DUR))
 			//* 

@@ -1,5 +1,5 @@
 /* multi-touch tracker */
-var loopInterval = 20;
+var loopInterval = 50;
 
 var canvas,
 	c, // c is the canvas' context 2D
@@ -26,6 +26,23 @@ function loop() {
 			100,
 			100,
 		);
+		genTone(
+			Math.exp(
+			5
+			+(
+			(
+			window.innerHeight
+			-pointsTouches[0].clientY
+			)
+			/200
+			)
+			)
+
+			,
+
+			pointsTouches[0].clientX
+			/window.innerWidth
+		).play();
 	}
 
 	if ( pointsTouches.length > 1 ) {
