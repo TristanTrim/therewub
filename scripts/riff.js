@@ -4,9 +4,14 @@
  * Reference: www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
  * Author: Lara Sophie Schütt
  * License: CC0
+ *
+ * Hacks for the Therewub
+ * Author: Tristan Trim
+ * License: GPL
+ *
  */
 
-const DUR = 0.1     // duration in seconds
+const DUR = 0.2     // duration in seconds
 const NCH = 1     // number of channels
 const SPS = 44100 // samples per second
 const BPS = 1     // bytes per sample
@@ -90,10 +95,12 @@ function genTone(freaq){
 			* 
 			(
 			Math.sin(
-			j/SPS * Math.PI * 2 * 110
+			j/SPS * Math.PI * 2 * 30
 			) + 1
 			) / 2 
-			* 
+			*
+			//((SPS*DUR-j)/(SPS*DUR))
+			//* 
 			Math.pow(
 			2, BPS * 8
 			)
@@ -108,11 +115,21 @@ function genTone(freaq){
 
 function positionHandler(e) {
 	b.innerHTML="pre";
+	let s = 0;
 	for (let i = 1;i<5;i++){
 		setTimeout(
-			()=>{genTone(110*i).play();},
-			100*i
+			()=>{genTone(120*i).play();},
+			1000*DUR*s
 		);
+		s = s+1;
+
+	}
+	for (let i = 5;i>1;i--){
+		setTimeout(
+			()=>{genTone(120*i).play();},
+			1000*DUR*s
+		);
+		s = s+1;
 
 	}
 	b.innerHTML="yo";

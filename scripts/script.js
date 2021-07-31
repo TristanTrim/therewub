@@ -1,4 +1,5 @@
 /* multi-touch tracker */
+var loopInterval = 20;
 
 var canvas,
 	c, // c is the canvas' context 2D
@@ -7,39 +8,41 @@ var canvas,
 
 var pointsTouches = [], pointsTargetTouches = [], pointsChangedTouches = [];
 
+
 function loop() {
+	let startTime = Date.now();
+
 	if(canvas.height != window.innerHeight * devicePixelRatio) {
 		resetCanvas();
 	} else {
 		c.clearRect(0,0,canvas.width, canvas.height);
 	}
-	c.strokeStyle = "#eee";
-	c.lineWidth = "10";
 
-	for (var i = 0; i<pointsTouches.length; i++) {
-		/* draw all circles */
-		c.beginPath();
-		c.arc(pointsTouches[i].clientX, pointsTouches[i].clientY, 60, 0, Math.PI*2, true);
-		c.stroke();
+	if ( pointsTouches.length > 0 ) {
+		c.fillStyle = "#fa0";
+		c.fillRect(
+			pointsTouches[0].clientX-50,
+			pointsTouches[0].clientY-50,
+			100,
+			100,
+		);
 	}
 
-	c.strokeStyle = "#1f1";
-	for (var i = 0; i<pointsTargetTouches.length; i++) {
-		/* draw all circles */
-		c.beginPath();
-		c.arc(pointsTargetTouches[i].clientX, pointsTargetTouches[i].clientY, 50, 0, Math.PI*2, true);
-		c.stroke();
+	if ( pointsTouches.length > 1 ) {
+		c.fillStyle = "#00f";
+		c.fillRect(
+			pointsTouches[1].clientX-50,
+			pointsTouches[1].clientY-50,
+			100,
+			100,
+		);
 	}
 
-	c.strokeStyle = "#f11";
-	for (var i = 0; i<pointsChangedTouches.length; i++) {
-		/* draw all circles */
-		c.beginPath();
-		c.arc(pointsChangedTouches[i].clientX, pointsChangedTouches[i].clientY, 40, 0, Math.PI*2, true);
-		c.stroke();
-	}
 
-}
+	let calcTime = Date.now() - startTime;
+	b = document.getElementsByTagName('button')[0];
+	b.innerHTML=calcTime;
+} // end loop
 
 function positionHandler(e) {
 	if ((e.clientX)&&(e.clientY)) {
@@ -70,9 +73,7 @@ function init() {
 	b.addEventListener('touchend',  positionHandler, false );
 	b.addEventListener('touchcancel',  positionHandler, false );
 	
-	setInterval(loop, 1000/35);
-
-
+	setInterval(loop, loopInterval);
 
 
 }// end of init
