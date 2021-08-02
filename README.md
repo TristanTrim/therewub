@@ -5,7 +5,7 @@ This is kinda a prototype of a theremin I think it would be cool to build. It wo
 
 If that didn't make much sense to you it's probably better to just play with it to see what I mean:
 
-LINK GOES HERE
+[tristantrim.github.io/therewub/](https://tristantrim.github.io/therewub/)
 
 It right now needs a multi-touch device like a phone to run on. Drop me a line if it breaks for you, or if you have any thoughts.
 
