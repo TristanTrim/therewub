@@ -1,5 +1,5 @@
 /* multi-touch tracker */
-var loopInterval = 50;
+var loopInterval = 20;//ms
 
 var canvas,
 	c, // c is the canvas' context 2D
@@ -10,7 +10,12 @@ var pointsTouches = [], pointsTargetTouches = [], pointsChangedTouches = [];
 
 
 function loop() {
+
 	let startTime = Date.now();
+
+	var slider = document.getElementById("myRange");
+	b.innerHTML = slider.value;
+	loopInterval = slider.value;
 
 	if(canvas.height != window.innerHeight * devicePixelRatio) {
 		resetCanvas();
@@ -58,7 +63,10 @@ function loop() {
 
 	let calcTime = Date.now() - startTime;
 	b = document.getElementsByTagName('button')[0];
-	b.innerHTML=calcTime;
+	//b.innerHTML=calcTime;
+	
+	setTimeout(loop,
+		loopInterval);
 } // end loop
 
 function positionHandler(e) {
@@ -66,8 +74,8 @@ function positionHandler(e) {
 		points[0] = e;
 	} else if (e.targetTouches) {
 		pointsTouches = e.touches;
-		pointsTargetTouches = e.targetTouches;
-		pointsChangedTouches = e.changedTouches;
+		//pointsTargetTouches = e.targetTouches;
+		//pointsChangedTouches = e.changedTouches;
 		e.preventDefault();
 	}
 }
@@ -90,7 +98,7 @@ function init() {
 	b.addEventListener('touchend',  positionHandler, false );
 	b.addEventListener('touchcancel',  positionHandler, false );
 	
-	setInterval(loop, loopInterval);
+	setTimeout(loop, loopInterval);
 
 
 }// end of init

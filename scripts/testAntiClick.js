@@ -11,7 +11,7 @@
  *
  */
 
-const goalDUR = 0.03     // duration in seconds
+const goalDUR = 0.1     // duration in seconds
 const NCH = 1     // number of channels
 const SPS = 44100 // samples per second
 const BPS = 1     // bytes per sample
@@ -65,25 +65,41 @@ function put(n, l)
 
 let b = document.getElementsByTagName('button')[0];
 
-function genTone(freaq,vol){
+function genTone(freaq,vol,excyc){
 
-	b.innerHTML = "foo";
+
+	//b.innerHTML = "foo";
+
+	let spc = SPS / freaq;
+
+	let extra = Math.floor(2*Math.PI*excyc * spc);
 
 	let samples = SPS*goalDUR;
-	let posOrNeg;
-	if (Math.sin(samples/SPS * Math.PI*2*freaq)>0){
-		posOrNeg = -1;
-	}else{
-		posOrNeg = 1;
-	}
-	b.innerHTML = "5";
-	for (let j = samples; j>=0; j--){
-		if (posOrNeg * Math.sin(j/SPS * Math.PI*2*freaq)>0){
-			samples = j;
-			b.innerHTML = samples;
-			break;
-		}
-	}
+	let endcut = samples % spc;
+
+	samples = samples - endcut + extra;
+
+	b.innerHTML = Math.floor(
+			(
+			Math.sin(
+			(samples-1)/SPS * Math.PI * 2 * freaq
+			) + 1
+			) / 2 
+			* 
+			(
+			Math.sin(
+			(samples-1)/SPS * Math.PI * 2 * 30
+			) + 1
+			) / 2 
+			*
+			vol
+			*
+			//((SPS*DUR-j)/(SPS*DUR))
+			//* 
+			Math.pow(
+			2, BPS * 8
+			)
+			);
 
 	let SIZE = samples * NCH * BPS;
 	let data = "RIFF" + put(44 + SIZE, 4) + "WAVEfmt " + put(16, 4)
@@ -97,69 +113,55 @@ function genTone(freaq,vol){
 
 	data += "data" + put(SIZE, 4)
 
-	let nxtDat;
+	//b.innerHTML = "here";
 
-	for (let j = 0; j < samples-1; j++)
+	for (let j = 0; j < samples; j++)
 	{
-		nxtDat = 
+		data += put(
 			Math.floor(
-			(
 			(
 			Math.sin(
 			j/SPS * Math.PI * 2 * freaq
-			)
-			* vol
-			)+ 1
+			) + 1
 			) / 2 
-		//	* 
-		//	(
-		//	Math.sin(
-		//	j/SPS * Math.PI * 2 * 30
-		//	) + 1
-		//	) / 2 
+			* 
+			(
+			Math.sin(
+			j/SPS * Math.PI * 2 * 30
+			) + 1
+			) / 2 
+			*
+			vol
 			*
 			//((SPS*DUR-j)/(SPS*DUR))
 			//* 
 			Math.pow(
 			2, BPS * 8
 			)
-			);
-
-		data += put(
-			nxtDat
-			, BPS
-			);
+			), BPS
+		);
 	}
-	nxtDat = Math.pow(
-			2, BPS * 8
-			)/2;
-	data += put(
-		nxtDat
-		, BPS);
+//	data += put(
+//		0
+//		, BPS);
 
+	//b.innerHTML = "done";
 	const WAV = new Audio("data:Audio/WAV;base64," + btoa(data))
 	return(WAV);
 }
 
 function positionHandler(e) {
 	b.innerHTML="pre";
-	let s = 0;
-	for (let i = 1;i<5;i++){
-		setTimeout(
-			()=>{genTone(120*i).play();},
-			1000*DUR*s
-		);
-		s = s+1;
 
-	}
-	for (let i = 5;i>1;i--){
-		setTimeout(
-			()=>{genTone(120*i).play();},
-			1000*DUR*s
-		);
-		s = s+1;
+	var slider = document.getElementById("myRange");
+	b.innerHTML = slider.value;
+	let extra = slider.value;
 
-	}
+	setTimeout(
+		()=>{genTone(60,1,extra).play()}
+		, 100
+	);
+
 }
 //WAV.setAttribute("controls","controls");
 window.addEventListener('load',function() {
