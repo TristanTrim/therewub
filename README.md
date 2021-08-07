@@ -7,7 +7,7 @@ If that didn't make much sense to you it's probably better to just play with it 
 
 [tristantrim.github.io/therewub/](https://tristantrim.github.io/therewub/)
 
-It right now needs a multi-touch device like a phone to run on. Drop me a line if it breaks for you, or if you have any thoughts.
+It right now needs a multi-touch device like a phone to run on. It also only works on Firefox afaik. Should be easy enough to get it to work on chrome as well, but I'd have to find time to do it. Drop me a line if it breaks for you, or if you have any thoughts.
 
 I think it would be better to build an actual theremin like this cause there's something about actual EM fields that capacitive digital displays don't have... But this does have the advantage of being sharable on the web, which is pretty cool imo.
 
