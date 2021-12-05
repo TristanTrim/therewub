@@ -1,29 +1,17 @@
 html,body {
-	background: #eee;
-	color: #fff;
+	background-color: #222;
+	color: #f00;
 	font: 1em/1 Arial, sans; max-width: 45em;
 	touch-action: none;
 }
 
-h1 {
-	font-size: 1.2em;
+img, .img {
+	position: absolute;
+	width: 200px;
+	left: 100;
+	top: 100;
 }
 
-canvas {
-	background-color:#222;
-	display:block; 
-	position:absolute;
-	top: 0;
-	left: 0;
-	z-index: 0;
-}
-
-#container {
-	position: relative;
-	z-index: 1;
-	opacity: 0.75;
-	top: 1em;
-}
 
 button, .button {
 	width: 100%;

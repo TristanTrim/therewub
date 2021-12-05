@@ -12,14 +12,21 @@
 	<img id="wub" src="media/blue.png" width="200px">
 	<img id="carrier" src="media/orange.png" width="200px">
 
-	<input type="range" min="0" max="2" value="0.1" class="slider" id="myRange" step="0.1" >
-	<button id="butt">InfoButton</button>
+	<div id="carrier-display" style="color:#ff8800"></div>
+	<div id="wub-display" style="color:#0088ff"></div>
+
 	<!--
 	<script src="scripts/testAntiClick.js"></script>
 	<script src="scripts/riff.js"></script>
 	<script src="scripts/testAudeoCont.js"></script>
 	<script src="scripts/script.js"></script>
 	!-->
+	<!-- if you don't include notes first
+		therewub will break...
+		JS is just a bad language if you
+		don't want to use a pile of frameworks and other nonsense. Don't be like me !-->
+	<script src="scripts/notes.js"></script>
+	<script src="scripts/getqs.js"></script>
 	<script src="scripts/therewub.js"></script>
 </body>
 </html>
