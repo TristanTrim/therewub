@@ -3,7 +3,7 @@
 // https://pages.mtu.edu/~suits/notefreqs.html
 
 
-notes = [
+carNotes = [
   ["C0", 16.35 ],
   ["C#0/Db0  ", 17.32 ],
   ["D0", 18.35 ],

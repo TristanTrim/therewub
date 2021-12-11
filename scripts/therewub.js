@@ -43,33 +43,54 @@ carrier.start(0);
 var wubPuck = document.getElementById("wub");
 var carrierPuck = document.getElementById("carrier");
 
+// because I am coding on a phone, my debug
+// tools consist of printlining to this div
+// It's super dumb.
+var debugDisplay = document.getElementById("debug-display");
 var wubDisplay = document.getElementById("wub-display");
 var carrierDisplay = document.getElementById("carrier-display");
 
 wubDisplay.innerHTML = "foo";
 carrierDisplay.innerHTML = "foo";
 
+
+////////////////////////////////////////
+// coord to frequency & frequency floor
+////////////////////////////////////////
+
 function floorNote(f){
-	if ( f < notes[0][1] ){
+	if ( f < carNotes[0][1] ){
 		return("too low", 1);
 	}
-	for (let i = 1; i<notes.length; i++){
-		if ( f < notes[i][1] ){
-			return(notes[i-1]);
+	for (let i = 1; i<carNotes.length; i++){
+		if ( f < carNotes[i][1] ){
+			return(carNotes[i-1]);
 		}
 	}
 	return(["too high",9001]);
 }
 
-function straightWubFreq(y){
+function floorWub(f){
+	if ( f < wubNotes[0][1] ){
+		return("too slow", 0.01);
+	}
+	for (let i = 1; i<wubNotes.length; i++){
+		if ( f < wubNotes[i][1] ){
+			return(wubNotes[i-1]);
+		}
+	}
+	return(wubNotes[wubNotes.length-1]);
+}
+
+function getWubFreq(y){
 	f = Math.pow(2,
 		0 +(
 		6*( window.innerHeight -y)
 		/window.innerHeight));
-	return( f );
+	return( floorWub(f) );
 }
 
-function straightCarFreq(y){
+function getCarFreq(y){
 	f = Math.pow(2,
 		5 +( 3*
 		( window.innerHeight -y)
@@ -78,64 +99,92 @@ function straightCarFreq(y){
 }
 
 
+//////////////////////////
+// create musical scale
+//////////////////////////
+
+///// MELODY SCALE
 
 // scales ! how do they work? Is this dorian mode? How can one know until they start to play!?!?!!!
-carrierDisplay.innerHTML = "1";
-carrierDisplay.innerHTML = getParameterByName("car");
 if (getParameterByName("car") == "CmajAmin") {
 
-	raw = false;
+	carrierIsRaw = false;
 
-	carrierDisplay.innerHTML = "2";
 	let newNotes = [];
 	let i = 0;
 	while (true){
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// tone
 		i+=2;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// tone
 		i+=2;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// semitone
 		i+=1;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// tone
 		i+=2;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// tone
 		i+=2;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// tone
 		i+=2;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
-		newNotes.push(notes[i]);
+		newNotes.push(carNotes[i]);
 		// semitone
 		i+=1;
-		if (i>= notes.length) break;
+		if (i>= carNotes.length) break;
 
 	}
 
-	notes = newNotes;
+	carNotes = newNotes;
+
 } else if (getParameterByName("car") == "Chrom") {
-	raw = false;
+	carrierIsRaw = false;
 } else {
-	raw = true;
+	carrierIsRaw = true;
 }
 
+///// WUB SCALE
+
+wubNotes = [["2/1",0.5]];
+for( let i=1; i<=64; i=2*i ){
+	wubNotes.push(["1/"+i,i]);
+}
+if (getParameterByName("wub") == "dubs") {
+	wubIsRaw = false;
+}else{
+	wubIsRaw = true;
+}
+
+
+///////////////////
+// "mainloop"
+///////////////////
+
 function loop() {
+
+	// TODO handle multi touches better
+	// maybe have any touch -> car or wub
+	// be based on side of screen
+	// then... you could also allow
+	// chords. That would be cool.
+
+	// wub aka modulation
 	if ( pointsTouches.length > 0 ) {
 		let x = pointsTouches[0].clientX;
 		let y = pointsTouches[0].clientY;
@@ -145,11 +194,19 @@ function loop() {
 		wubPuck.style.left = x-100+"px";
 		wubPuck.style.top = y-100+"px";
 
-		f = straightWubFreq(y);
+		let nameandfreq = getWubFreq(y);// TODO not side effect f
 
-		wubDisplay.innerHTML = f.toFixed(4)+" Hz";
+		let name = nameandfreq[0];
+		if (wubIsRaw){
+			freq = f;
+			name = name+"ish";
+		}else{
+			freq = nameandfreq[1];
+		}
+		wubDisplay.innerHTML = freq.toFixed(4)+" Hz ("+name+")";
 
-		wub.frequency.value = f;
+
+		wub.frequency.value = freq;
 
 		let wg = 
 			8*( 
@@ -160,6 +217,7 @@ function loop() {
 		wubGain.gain.value = wg;
 	}
 
+	// melody / carrier / car
 	if ( pointsTouches.length > 1 ) {
 		let x = pointsTouches[1].clientX;
 		let y = pointsTouches[1].clientY;
@@ -169,9 +227,9 @@ function loop() {
 		carrierPuck.style.left = x-100+"px";
 		carrierPuck.style.top = y-100+"px";
 
-		nameandfreq = straightCarFreq(y);
+		let nameandfreq = getCarFreq(y);
 		name = nameandfreq[0];
-		if (raw){
+		if (carrierIsRaw){
 			freq = f;
 		}else{
 			freq = nameandfreq[1];
