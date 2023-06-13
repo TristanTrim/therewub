@@ -1,47 +1,14 @@
 
-
-// ehhhhhhh
-//
-/* multi-touch tracker */
 var loopInterval = 20;//ms
 
-var pointsTouches = [];
 
-// audio
-//
-var context = new AudioContext()
-var wub = context.createOscillator()
-var carrier = context.createOscillator()
-var wubGain = context.createGain();
-var carrierGain = context.createGain();
-var modulationGain = context.createGain();
 
-wub.frequency.value = 5;
-carrier.frequency.value = 120;
-
-wubGain.gain = 0;
-carrierGain.gain = 0;
-
-wub.connect(wubGain);
-carrier.connect(carrierGain);
-
-carrierGain.connect(modulationGain);
-wubGain.connect(modulationGain.gain);
-
-c =  context.createConstantSource();//{offset: 1})
-c.offset.value = 1;
-c.connect(modulationGain.gain);
-
-modulationGain.connect(context.destination);
-
-c.start(0);
-wub.start(0);
-carrier.start(0);
-
-// heres stuff for pucks
-//
+	// heres stuff for pucks
+	//
 var wubPuck = document.getElementById("wub");
 var carrierPuck = document.getElementById("carrier");
+var untouched = true;
+var whichPuck = 0;
 
 // because I am coding on a phone, my debug
 // tools consist of printlining to this div
@@ -49,10 +16,53 @@ var carrierPuck = document.getElementById("carrier");
 var debugDisplay = document.getElementById("debug-display");
 var wubDisplay = document.getElementById("wub-display");
 var carrierDisplay = document.getElementById("carrier-display");
+var initOnce = false;
 
 wubDisplay.innerHTML = "foo";
 carrierDisplay.innerHTML = "foo";
 
+function initTherewub(){
+	if(initOnce){
+		return;
+	}
+	initOnce = true;
+	// ehhhhhhh
+	//
+	/* multi-touch tracker */
+	var pointsTouches = [];
+
+	// audio
+	//
+	var context = new AudioContext()
+	window.wub = context.createOscillator()
+	window.carrier = context.createOscillator()
+	window.wubGain = context.createGain();
+	window.carrierGain = context.createGain();
+	window.modulationGain = context.createGain();
+
+	window.wub.frequency.value = 5;
+	window.carrier.frequency.value = 120;
+
+	window.wubGain.gain = 0;
+	window.carrierGain.gain = 0;
+
+	window.wub.connect(window.wubGain);
+	window.carrier.connect(window.carrierGain);
+
+	window.carrierGain.connect(window.modulationGain);
+	window.wubGain.connect(window.modulationGain.gain);
+
+	c =  context.createConstantSource();//{offset: 1})
+	c.offset.value = 1;
+	c.connect(window.modulationGain.gain);
+
+	window.modulationGain.connect(context.destination);
+
+	c.start(0);
+	window.wub.start(0);
+	window.carrier.start(0);
+
+}
 
 ////////////////////////////////////////
 // coord to frequency & frequency floor
@@ -184,63 +194,81 @@ function loop() {
 	// then... you could also allow
 	// chords. That would be cool.
 
-	// wub aka modulation
-	if ( pointsTouches.length > 0 ) {
-		let x = pointsTouches[0].clientX;
-		let y = pointsTouches[0].clientY;
-
-		if (x < window.innerWidth/2)
-			x=window.innerWidth/2;	
-		wubPuck.style.left = x-100+"px";
-		wubPuck.style.top = y-100+"px";
-
-		let nameandfreq = getWubFreq(y);// TODO not side effect f
-
-		let name = nameandfreq[0];
-		if (wubIsRaw){
-			freq = f;
-			name = name+"ish";
-		}else{
-			freq = nameandfreq[1];
-		}
-		wubDisplay.innerHTML = freq.toFixed(4)+" Hz ("+name+")";
-
-
-		wub.frequency.value = freq;
-
-		let wg = 
-			8*( 
-			(window.innerWidth- x)
-			/window.innerWidth
-			)-0.5;
-		if (wg<0) wg=0;
-		wubGain.gain.value = wg;
-	}
-
-	// melody / carrier / car
-	if ( pointsTouches.length > 1 ) {
-		let x = pointsTouches[1].clientX;
-		let y = pointsTouches[1].clientY;
-
-		if (x > window.innerWidth/2)
-			x=window.innerWidth/2;	
-		carrierPuck.style.left = x-100+"px";
-		carrierPuck.style.top = y-100+"px";
-
-		let nameandfreq = getCarFreq(y);
-		name = nameandfreq[0];
-		if (carrierIsRaw){
-			freq = f;
-		}else{
-			freq = nameandfreq[1];
+	if ( pointsTouches.length == 0){
+		//console.log("I feel so untouched");
+		untouched = true;
+	}else{
+		if( untouched ){
+			//console.log("I feel so touched");
+			if( pointsTouches[0].clientX < window.innerWidth/2 ){
+				whichPuck = 1;
+			}else{
+				whichPuck = 0;
+			}
+			untouched = false;
 		}
 
-		carrierDisplay.innerHTML = freq.toFixed(4)+" Hz ("+name+")";
+		// wub aka modulation
+		if ( whichPuck == 0  || pointsTouches.length > 1) {
+			if (untouched){
+				
+			}
+			let x = pointsTouches[0+whichPuck].clientX;
+			let y = pointsTouches[0+whichPuck].clientY;
 
-		carrier.frequency.value = freq;
+			if (x < window.innerWidth/2)
+				x=window.innerWidth/2;	
+			wubPuck.style.left = x-100+"px";
+			wubPuck.style.top = y-100+"px";
 
-		carrierGain.gain.value = 
-			4* x /window.innerWidth;
+			let nameandfreq = getWubFreq(y);// TODO not side effect f
+
+			let name = nameandfreq[0];
+			if (wubIsRaw){
+				freq = f;
+				name = name+"ish";
+			}else{
+				freq = nameandfreq[1];
+			}
+			wubDisplay.innerHTML = freq.toFixed(4)+" Hz ("+name+")";
+
+
+			window.wub.frequency.value = freq;
+
+			let wg = 
+				8*( 
+				(window.innerWidth- x)
+				/window.innerWidth
+				)-0.5;
+			if (wg<0) wg=0;
+			window.wubGain.gain.value = wg;
+		}
+
+		// melody / carrier / car
+		if ( whichPuck == 1 || pointsTouches.length > 1) {
+			let x = pointsTouches[1-whichPuck].clientX;
+			let y = pointsTouches[1-whichPuck].clientY;
+
+			if (x > window.innerWidth/2)
+				x=window.innerWidth/2;	
+			carrierPuck.style.left = x-100+"px";
+			carrierPuck.style.top = y-100+"px";
+
+			let nameandfreq = getCarFreq(y);
+			name = nameandfreq[0];
+			if (carrierIsRaw){
+				freq = f;
+			}else{
+				freq = nameandfreq[1];
+			}
+
+			carrierDisplay.innerHTML = freq.toFixed(4)+" Hz ("+name+")";
+
+			window.carrier.frequency.value = freq;
+
+			window.carrierGain.gain.value = 
+				4* x /window.innerWidth;
+		}
 	}
 }
 
@@ -249,21 +277,40 @@ function positionHandler(e) {
 		pointsTouches = e.touches;
 		e.preventDefault();
 	}
+	else if( e.buttons == 1 )
+	{
+		pointsTouches = [{"clientX":e.x,"clientY":e.y}];
+		e.preventDefault();
+	}
+	else{
+		pointsTouches = [];
+	}
 }
 
-function init() {
+function initLoad() {
+
+	document.addEventListener('touchstart', initAfterClick, false );
+	document.addEventListener('mousedown', initAfterClick, false );
+
+}
+function initAfterClick() {
 	wubPuck.style.position = "absolute";
 	carrierPuck.style.position = "absolute";
+
+	initTherewub();
 
 	document.addEventListener('touchstart', positionHandler, false );
 	document.addEventListener('touchmove',  positionHandler, false );
 	document.addEventListener('touchend',  positionHandler, false );
 	document.addEventListener('touchcancel',  positionHandler, false );
+	
+	document.addEventListener('mousemove',  positionHandler, false );
+	document.addEventListener('mousedown',  positionHandler, false );
 
 	setInterval(loop,loopInterval);
 }
 
 window.addEventListener('load',function() {
 	/* hack to prevent firing the init script before the window object's values are populated */
-	setTimeout(init,100);
+	setTimeout(initLoad,100);
 },false);
